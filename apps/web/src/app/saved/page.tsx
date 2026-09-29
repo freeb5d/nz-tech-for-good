@@ -13,7 +13,7 @@ export default function SavedPage() {
         dangerouslySetInnerHTML={{
           __html: `
             try {
-              var slugs = JSON.parse(localStorage.getItem("saved-entries") || "[]");
+              var slugs = JSON.parse(localStorage.getItem("saved-entries") || "[]"); if (!Array.isArray(slugs)) slugs = []; slugs = slugs.filter(function(s) { return typeof s === "string" && /^[a-z0-9-]+$/.test(s); });
             } catch(e) { var slugs = []; }
             var root = document.getElementById("saved-root");
             if (slugs.length === 0) {

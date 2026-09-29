@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
 import type { Entry, getDomains, getRegions } from '@/lib/data';
@@ -28,6 +28,20 @@ export default function DirectoryClient({ entries, domains, regions }: Directory
   const [decade, setDecade] = useState('');
   const [sort, setSort] = useState('name-asc');
   const [page, setPage] = useState(1);
+
+  // Honour ?q= and ?region= links (tags, stats, region pages) on first load.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    const r = params.get('region');
+    if (q) setSearch(q);
+    if (r) setRegion(r);
+  }, []);
+
+  // Bring the list back into view when paging.
+  useEffect(() => {
+    if (page > 1) window.scrollTo({ top: 0 });
+  }, [page]);
 
   const filtered = useMemo(() => {
     let result = entries;
@@ -98,6 +112,14 @@ export default function DirectoryClient({ entries, domains, regions }: Directory
     setSort('name-asc');
     setPage(1);
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') clear();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const randomEntry = () => {
     if (filtered.length === 0) return;

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { buildEntryFeedbackUrl } from '@/lib/feedback';
+import { domainSlug } from '@/lib/domain-slug';
 
 interface EntryCardProps {
   slug: string;
@@ -32,7 +33,9 @@ interface EntryCardProps {
 }
 
 function Freshness({ date }: { date: string }) {
-  const daysAgo = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
+  const parsed = new Date(date).getTime();
+  if (Number.isNaN(parsed)) return null;
+  const daysAgo = Math.max(0, Math.floor((Date.now() - parsed) / 86400000));
   const label =
     daysAgo <= 7
       ? 'This week'
@@ -65,6 +68,7 @@ function MetaIcon({
 export function EntryCard({
   slug,
   name,
+  domain,
   domainLabel,
   what,
   region,
@@ -82,7 +86,7 @@ export function EntryCard({
     <li className="rounded-lg border border-border bg-surface p-4 transition-shadow hover:shadow-md">
       <div className="mb-2 flex items-center gap-2">
         <Link
-          href={`/domains/${domainLabel.toLowerCase().replace(/\s+/g, '-')}`}
+          href={`/domains/${domainSlug(domain)}`}
           className="rounded-full bg-brand-soft px-2 py-0.5 text-center text-xs font-medium text-brand"
         >
           {domainLabel}

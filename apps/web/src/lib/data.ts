@@ -64,6 +64,7 @@ let _entries: Entry[] | null = null;
 
 export function getAllEntries(): Entry[] {
   if (_entries) return _entries;
+  if (!fs.existsSync(ENTRIES_DIR)) return [];
   const files = fs
     .readdirSync(ENTRIES_DIR)
     .filter((f) => f.endsWith('.yaml'))
@@ -88,8 +89,8 @@ export function getAllEntries(): Entry[] {
       linkedin_org: String(raw.linkedin_org ?? ''),
       community_url: String(raw.community_url ?? ''),
       events_url: String(raw.events_url ?? ''),
-      tags: (raw.tags as string[]) ?? [],
-      related_to: (raw.related_to as string[]) ?? [],
+      tags: Array.isArray(raw.tags) ? raw.tags.map(String) : [],
+      related_to: Array.isArray(raw.related_to) ? raw.related_to.map(String) : [],
       source: String(raw.source ?? ''),
       founding_year: (raw.founding_year as number | null) ?? null,
       takes_contributors: (raw.takes_contributors as boolean | null) ?? null,
@@ -102,6 +103,8 @@ export function getAllEntries(): Entry[] {
   return entries;
 }
 
+import { domainSlug } from '@/lib/domain-slug';
+
 export function getDomains() {
   const counts = new Map<string, number>();
   for (const e of getAllEntries()) {
@@ -111,7 +114,7 @@ export function getDomains() {
     .map(([key, count]) => ({
       key,
       label: domainLabel(key),
-      slug: key.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: domainSlug(key),
       count,
     }))
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
