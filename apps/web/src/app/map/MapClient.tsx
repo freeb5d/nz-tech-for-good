@@ -35,6 +35,13 @@ export function MapClient({ entries }: { entries: Entry[] }) {
   useEffect(() => {
     if (!mapRef.current || typeof window === 'undefined') return;
 
+    let cancelled = false;
+    let mapInstance: { remove: () => void } | null = null;
+    let searchEl: HTMLInputElement | null = null;
+    let onSearch: (() => void) | null = null;
+
+    const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
     const loadLeaflet = async () => {
       // Load CSS
       if (!document.querySelector('link[href*="leaflet"]')) {
@@ -54,9 +61,10 @@ export function MapClient({ entries }: { entries: Entry[] }) {
       }
 
       const L = (window as any).L;
-      if (!L || !mapRef.current) return;
+      if (cancelled || !L || !mapRef.current) return;
 
       const map = L.map(mapRef.current).setView([-40.9, 174.0], 6);
+      mapInstance = map;
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OSM',
         maxZoom: 18,
@@ -85,9 +93,10 @@ export function MapClient({ entries }: { entries: Entry[] }) {
 
       // Search
       const search = document.getElementById('map-search') as HTMLInputElement;
-      const container = document.getElementById('map-entries')!;
-      if (search) {
-        search.addEventListener('input', () => {
+      const container = document.getElementById('map-entries');
+      if (search && container) {
+        searchEl = search;
+        onSearch = () => {
           const q = search.value.toLowerCase();
           if (!q) {
             container.innerHTML = '';
@@ -105,20 +114,27 @@ export function MapClient({ entries }: { entries: Entry[] }) {
               .map(
                 (e) =>
                   "<div class='mb-1 text-sm'><a href='/entry/" +
-                  e.slug +
+                  encodeURIComponent(e.slug) +
                   "/' class='text-brand hover:underline'>" +
-                  e.name +
+                  escapeHtml(e.name) +
                   "</a> <span class='text-text-muted'>· " +
-                  e.domainLabel +
+                  escapeHtml(e.domainLabel) +
                   ' · ' +
-                  e.region +
+                  escapeHtml(e.region) +
                   '</span></div>'
               )
               .join('');
-        });
+        };
+        search.addEventListener('input', onSearch);
       }
     };
     loadLeaflet();
+
+    return () => {
+      cancelled = true;
+      if (searchEl && onSearch) searchEl.removeEventListener('input', onSearch);
+      mapInstance?.remove();
+    };
   }, [entries]);
 
   const regionEntries: Record<string, Entry[]> = {};
