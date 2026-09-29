@@ -33,7 +33,9 @@ interface EntryCardProps {
 }
 
 function Freshness({ date }: { date: string }) {
-  const daysAgo = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
+  const parsed = new Date(date).getTime();
+  if (Number.isNaN(parsed)) return null;
+  const daysAgo = Math.max(0, Math.floor((Date.now() - parsed) / 86400000));
   const label =
     daysAgo <= 7
       ? 'This week'
