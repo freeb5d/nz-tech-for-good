@@ -42,8 +42,8 @@ export function Header() {
     const onChange = (e: MediaQueryListEvent) => {
       if (!readSaved()) applyTheme(e.matches);
     };
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
   }, []);
 
   useEffect(() => {
