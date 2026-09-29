@@ -85,7 +85,7 @@ export function EntryCard({
       <div className="mb-2 flex items-center gap-2">
         <Link
           href={`/domains/${domainSlug(domain)}`}
-          className="rounded-full bg-brand-soft px-2 py-0.5 text-center text-xs font-medium text-brand"
+          className="max-w-full truncate rounded-full bg-brand-soft px-2 py-0.5 text-center text-xs font-medium text-brand"
         >
           {domainLabel}
         </Link>
@@ -96,7 +96,7 @@ export function EntryCard({
           </span>
         )}
       </div>
-      <h3 className="text-base font-semibold">
+      <h3 className="break-words text-base font-semibold">
         <Link href={`/entry/${slug}`} className="hover:text-brand">
           {name}
         </Link>
@@ -123,7 +123,7 @@ export function EntryCard({
             <Link
               key={t}
               href={`/directory?q=${encodeURIComponent(t)}`}
-              className="rounded-full bg-surface-alt px-2 py-0.5 text-center text-xs text-text-muted hover:bg-brand-soft hover:text-brand"
+              className="max-w-full truncate rounded-full bg-surface-alt px-2 py-0.5 text-center text-xs text-text-muted hover:bg-brand-soft hover:text-brand"
             >
               {t}
             </Link>
