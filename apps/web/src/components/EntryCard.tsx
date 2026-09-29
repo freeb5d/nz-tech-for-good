@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { buildEntryFeedbackUrl } from '@/lib/feedback';
+import { domainSlug } from '@/lib/domain-slug';
 
 interface EntryCardProps {
   slug: string;
@@ -65,6 +66,7 @@ function MetaIcon({
 export function EntryCard({
   slug,
   name,
+  domain,
   domainLabel,
   what,
   region,
@@ -82,8 +84,8 @@ export function EntryCard({
     <li className="rounded-lg border border-border bg-surface p-4 transition-shadow hover:shadow-md">
       <div className="mb-2 flex items-center gap-2">
         <Link
-          href={`/domains/${domainLabel.toLowerCase().replace(/\s+/g, '-')}`}
-          className="rounded-full bg-brand-soft px-2 py-0.5 text-center text-xs font-medium text-brand"
+          href={`/domains/${domainSlug(domain)}`}
+          className="max-w-full truncate rounded-full bg-brand-soft px-2 py-0.5 text-center text-xs font-medium text-brand"
         >
           {domainLabel}
         </Link>
@@ -94,7 +96,7 @@ export function EntryCard({
           </span>
         )}
       </div>
-      <h3 className="text-base font-semibold">
+      <h3 className="break-words text-base font-semibold">
         <Link href={`/entry/${slug}`} className="hover:text-brand">
           {name}
         </Link>
@@ -121,7 +123,7 @@ export function EntryCard({
             <Link
               key={t}
               href={`/directory?q=${encodeURIComponent(t)}`}
-              className="rounded-full bg-surface-alt px-2 py-0.5 text-center text-xs text-text-muted hover:bg-brand-soft hover:text-brand"
+              className="max-w-full truncate rounded-full bg-surface-alt px-2 py-0.5 text-center text-xs text-text-muted hover:bg-brand-soft hover:text-brand"
             >
               {t}
             </Link>
